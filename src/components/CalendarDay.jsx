@@ -9,19 +9,12 @@ function CalendarDay({ date, score, emotions = [], onClick }) {
 
   return (
     <button
-        type="button"
-        title={tooltip}
-        style={{
-          width: "14px",
-          height: "14px",
-          borderRadius: "3px",
-          backgroundColor,
-          cursor: "pointer",
-          border: "1px solid rgba(0, 0, 0, 0.08)",
-          padding: 0,
-        }}
-        onClick={() => onClick(date)}
-        aria-label="{tooltip}"
+      type="button"
+      title={tooltip}
+      onClick={() => onClick(date)}
+      aria-label={tooltip}
+      className="mood-calendar__day"
+      style={{ backgroundColor }}
     />
   );
 }

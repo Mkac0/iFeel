@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CalendarDay from "./CalendarDay";
 import { wellbeingColors } from "../utils/wellbeingColors";
+import "./MoodCalendar.css";
 
 function MoodCalendar() {
   const [selectedDay, setSelectedDay] = useState(null);
@@ -50,13 +51,10 @@ function MoodCalendar() {
 
   function generateCalendarDays() {
     const today = new Date();
-
     const endDate = new Date(today);
     const startDate = new Date(today);
 
     startDate.setFullYear(today.getFullYear() - 1);
-
-    // Move start date back to Sunday so our weeks line up
     startDate.setDate(startDate.getDate() - startDate.getDay());
 
     const days = [];
@@ -64,22 +62,18 @@ function MoodCalendar() {
 
     while (currentDate <= endDate) {
       const dateString = currentDate.toISOString().split("T")[0];
-
       days.push({
         date: dateString,
         dateObject: new Date(currentDate),
         score: moodData[dateString]?.score,
         emotions: moodData[dateString]?.emotions || [],
       });
-
       currentDate.setDate(currentDate.getDate() + 1);
     }
-
     return days;
   }
 
   const days = generateCalendarDays();
-
   const weeks = [];
 
   for (let i = 0; i < days.length; i += 7) {
@@ -94,7 +88,6 @@ function MoodCalendar() {
     }
 
     const currentMonth = firstDay.dateObject.getMonth();
-
     const previousMonth =
       index > 0 ? weeks[index - 1][0].dateObject.getMonth() : null;
 
@@ -103,7 +96,6 @@ function MoodCalendar() {
         month: "short",
       });
     }
-
     return "";
   });
 
@@ -114,39 +106,17 @@ function MoodCalendar() {
   const selectedMood = selectedDay ? moodData[selectedDay] : null;
 
   return (
-    <section
-      style={{
-        padding: "24px",
-        maxWidth: "1100px",
-        margin: "0 auto",
-      }}
-    >
-      <h2>Your emotional year</h2>
-      <p>This is how you've been feeling.</p>
+    <section className="mood-calendar">
 
-      <div
-        style={{
-          overflowX: "auto",
-          paddingBottom: "16px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: "8px",
-          }}
-        >
-          <div
-            style={{
-              display: "grid",
-              gridTemplateRows: "20px repeat(7, 14px)",
-              rowGap: "4px",
-              fontSize: "12px",
-              color: "#6b7280",
-            }}
-          >
+    <div className="mood-calendar__header">
+      <h2 className="mood-calendar__title">Your emotional year</h2>
+      <p className="mood-calendar__subtitle">This is how you've been feeling.</p>
+    </div>
+
+      <div className="mood-calendar__scroll">
+        <div className="mood-calendar__layout">"
+          <div className="mood-calendar__day-labels">
             <div />
-
             <div />
             <div>Mon</div>
             <div />
@@ -156,73 +126,38 @@ function MoodCalendar() {
             <div />
           </div>
 
-          <div>
-            <div
-              style={{
-                display: "grid",
-                gridAutoFlow: "column",
-                gridAutoColumns: "14px",
-                gap: "4px",
-                height: "20px",
-                fontSize: "12px",
-                color: "#6b7280",
-              }}
-            >
-              {monthLabels.map((month, index) => (
-                <div
-                  key={index}
-                  style={{
-                    whiteSpace: "nowrap",
-                    overflow: "visible",
-                  }}
-                >
-                  {month}
-                </div>
-              ))}
-            </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateRows: "repeat(7, 14px)",
-                gridAutoFlow: "column",
-                gridAutoColumns: "14px",
-                gap: "4px",
-                width: "max-content",
-              }}
-            >
-              {days.map((day) => (
-                <CalendarDay
-                  key={day.date}
-                  date={day.date}
-                  score={day.score}
-                  emotions={day.emotions}
-                  onClick={handleDayClick}
-                />
-              ))}
-            </div>
+          <div className="mood-calendar__month-labels">
+            {monthLabels.map((month, index) => (
+              <div
+                key={index}
+                className="mood-calendar__month-label"
+              >
+                {month}
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-          marginTop: "16px",
-          fontSize: "14px",
-        }}
-      >
+        <div className="mood-calendar__grid">
+          {days.map((day) => (
+            <CalendarDay
+              key={day.date}
+              date={day.date}
+              score={day.score}
+              emotions={day.emotions}
+              onClick={handleDayClick}
+            />
+          ))}
+        </div>
+
+        <div className="mood-calendar__legend">
         <span>Doing well</span>
 
         {[1, 3, 5, 7, 9, 10].map((score) => (
           <div
             key={score}
+            className="mood-calendar__legend-square"
             style={{
-              width: "14px",
-              height: "14px",
-              borderRadius: "3px",
               backgroundColor: wellbeingColors[score],
             }}
           />
@@ -232,24 +167,12 @@ function MoodCalendar() {
       </div>
 
       {selectedDay && (
-        <div
-          style={{
-            marginTop: "24px",
-            padding: "16px",
-            border: "1px solid #d1d5db",
-            borderRadius: "8px",
-          }}
-        >
+        <div className="mood-calendar__details">
           <h3>{selectedDay}</h3>
-
           {selectedMood ? (
             <>
-              <p>
-                <strong>Score:</strong> {selectedMood.score}/10
-              </p>
-
-              <p>
-                <strong>Emotions:</strong>{" "}
+              <p><strong>Score:</strong> {selectedMood.score}/10</p>
+              <p><strong>Emotions:</strong>{" "}
                 {selectedMood.emotions.join(", ")}
               </p>
             </>
@@ -258,6 +181,10 @@ function MoodCalendar() {
           )}
         </div>
       )}
+      <div className="mood-calendar__footer">
+        <p>© 2026 iFeel. All rights reserved.</p>
+      </div>
+    </div>
     </section>
   );
 }
