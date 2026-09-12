@@ -2,11 +2,12 @@ import { useState } from "react";
 import CalendarDay from "./CalendarDay";
 import { wellbeingColors } from "../utils/wellbeingColors";
 import "./MoodCalendar.css";
+import MoodEntryForm from "./MoodEntryForm";
 
 function MoodCalendar() {
   const [selectedDay, setSelectedDay] = useState(null);
 
-  const moodData = {
+  const [moodData, setMoodData] = useState({
     "2026-09-01": {
       score: 2,
       emotions: ["happy", "calm"],
@@ -21,7 +22,7 @@ function MoodCalendar() {
     },
     "2026-09-04": {
       score: 7,
-      emotions: ["stressed"],
+      emotions: ["stressed", "angry"],
     },
     "2026-09-05": {
       score: 9,
@@ -47,7 +48,18 @@ function MoodCalendar() {
       score: 2,
       emotions: ["happy"],
     },
-  };
+  });
+
+  function handleSaveMood(entry) {
+    setMoodData((currentMoodData) => ({
+      ...currentMoodData,
+      [entry.date]: {
+        score: entry.score,
+        emotions: entry.emotions,
+        note: entry.note,
+      },
+    }));
+  }
 
   function generateCalendarDays() {
     const today = new Date();
@@ -88,8 +100,7 @@ function MoodCalendar() {
     }
 
     const currentMonth = firstDay.dateObject.getMonth();
-    const previousMonth =
-      index > 0 ? weeks[index - 1][0].dateObject.getMonth() : null;
+    const previousMonth = index > 0 ? weeks[index - 1][0].dateObject.getMonth() : null;
 
     if (index === 0 || currentMonth !== previousMonth) {
       return firstDay.dateObject.toLocaleString("default", {
@@ -171,16 +182,32 @@ function MoodCalendar() {
           <h3>{selectedDay}</h3>
           {selectedMood ? (
             <>
-              <p><strong>Score:</strong> {selectedMood.score}/10</p>
-              <p><strong>Emotions:</strong>{" "}
+              <p>
+                <strong>Score:</strong>{" "}
+                {selectedMood.score}/10
+              </p>
+              <p>
+                <strong>Emotions:</strong>{" "}
                 {selectedMood.emotions.join(", ")}
               </p>
+              {selectedMood.note && (
+                <p>
+                  <strong>Note:</strong>{" "}
+                  {selectedMood.note}
+                </p>
+              )}
             </>
           ) : (
             <p>No mood entry recorded for this day.</p>
           )}
+
+          <MoodEntryForm
+            date={selectedDay}
+            onSave={handleSaveMood}
+          />
         </div>
       )}
+
       <div className="mood-calendar__footer">
         <p>© 2026 iFeel. All rights reserved.</p>
       </div>
