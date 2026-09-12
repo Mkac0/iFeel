@@ -1,83 +1,117 @@
-import React from 'react';
+import { useState } from "react";
 import CalendarDay from "./CalendarDay";
 import { wellbeingColors } from "../utils/wellbeingColors";
 
 function MoodCalendar() {
+  const [selectedDay, setSelectedDay] = useState(null);
+
   const moodData = {
     "2026-09-01": {
       score: 2,
       emotions: ["happy", "calm"],
     },
-
     "2026-09-02": {
       score: 3,
       emotions: ["okay"],
     },
-
     "2026-09-03": {
       score: 5,
       emotions: ["okay", "sad"],
     },
-
     "2026-09-04": {
       score: 7,
       emotions: ["stressed"],
     },
-
     "2026-09-05": {
       score: 9,
       emotions: ["anxious", "sad"],
     },
-
     "2026-09-06": {
       score: 10,
       emotions: ["overwhelmed", "anxious"],
     },
-
     "2026-09-07": {
       score: 8,
       emotions: ["sad"],
     },
-
     "2026-09-08": {
       score: 5,
       emotions: ["okay", "tired"],
     },
-
     "2026-09-09": {
       score: 4,
       emotions: ["okay"],
     },
-
     "2026-09-10": {
       score: 2,
       emotions: ["happy"],
     },
   };
 
-  function generateDays(numberOfDays = 365) {
-    const days = [];
+  function generateCalendarDays() {
     const today = new Date();
 
+    const endDate = new Date(today);
     const startDate = new Date(today);
-    startDate.setDate(today.getDate() - numberOfDays);
 
-    for (let i = 0; i <= numberOfDays; i++) {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(startDate.getDate() + i);
+    startDate.setFullYear(today.getFullYear() - 1);
 
+    // Move start date back to Sunday so our weeks line up
+    startDate.setDate(startDate.getDate() - startDate.getDay());
+
+    const days = [];
+    const currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
       const dateString = currentDate.toISOString().split("T")[0];
+
       days.push({
         date: dateString,
+        dateObject: new Date(currentDate),
         score: moodData[dateString]?.score,
         emotions: moodData[dateString]?.emotions || [],
       });
+
+      currentDate.setDate(currentDate.getDate() + 1);
     }
 
     return days;
   }
 
-  const days = generateDays();
+  const days = generateCalendarDays();
+
+  const weeks = [];
+
+  for (let i = 0; i < days.length; i += 7) {
+    weeks.push(days.slice(i, i + 7));
+  }
+
+  const monthLabels = weeks.map((week, index) => {
+    const firstDay = week[0];
+
+    if (!firstDay) {
+      return null;
+    }
+
+    const currentMonth = firstDay.dateObject.getMonth();
+
+    const previousMonth =
+      index > 0 ? weeks[index - 1][0].dateObject.getMonth() : null;
+
+    if (index === 0 || currentMonth !== previousMonth) {
+      return firstDay.dateObject.toLocaleString("default", {
+        month: "short",
+      });
+    }
+
+    return "";
+  });
+
+  function handleDayClick(date) {
+    setSelectedDay(date);
+  }
+
+  const selectedMood = selectedDay ? moodData[selectedDay] : null;
 
   return (
     <section
@@ -98,23 +132,76 @@ function MoodCalendar() {
       >
         <div
           style={{
-            display: "grid",
-            gridTemplateRows: "repeat(7, 14px)",
-            gridAutoFlow: "column",
-            gridAutoColumns: "14px",
-            gap: "4px",
-            width: "max-content",
-            padding: "20px 0",
+            display: "flex",
+            gap: "8px",
           }}
         >
-          {days.map((day) => (
-            <CalendarDay
-              key={day.date}
-              date={day.date}
-              score={day.score}
-              emotions={day.emotions}
-            />
-          ))}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateRows: "20px repeat(7, 14px)",
+              rowGap: "4px",
+              fontSize: "12px",
+              color: "#6b7280",
+            }}
+          >
+            <div />
+
+            <div />
+            <div>Mon</div>
+            <div />
+            <div>Wed</div>
+            <div />
+            <div>Fri</div>
+            <div />
+          </div>
+
+          <div>
+            <div
+              style={{
+                display: "grid",
+                gridAutoFlow: "column",
+                gridAutoColumns: "14px",
+                gap: "4px",
+                height: "20px",
+                fontSize: "12px",
+                color: "#6b7280",
+              }}
+            >
+              {monthLabels.map((month, index) => (
+                <div
+                  key={index}
+                  style={{
+                    whiteSpace: "nowrap",
+                    overflow: "visible",
+                  }}
+                >
+                  {month}
+                </div>
+              ))}
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateRows: "repeat(7, 14px)",
+                gridAutoFlow: "column",
+                gridAutoColumns: "14px",
+                gap: "4px",
+                width: "max-content",
+              }}
+            >
+              {days.map((day) => (
+                <CalendarDay
+                  key={day.date}
+                  date={day.date}
+                  score={day.score}
+                  emotions={day.emotions}
+                  onClick={handleDayClick}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -143,6 +230,34 @@ function MoodCalendar() {
 
         <span>Difficult</span>
       </div>
+
+      {selectedDay && (
+        <div
+          style={{
+            marginTop: "24px",
+            padding: "16px",
+            border: "1px solid #d1d5db",
+            borderRadius: "8px",
+          }}
+        >
+          <h3>{selectedDay}</h3>
+
+          {selectedMood ? (
+            <>
+              <p>
+                <strong>Score:</strong> {selectedMood.score}/10
+              </p>
+
+              <p>
+                <strong>Emotions:</strong>{" "}
+                {selectedMood.emotions.join(", ")}
+              </p>
+            </>
+          ) : (
+            <p>No mood entry recorded for this day.</p>
+          )}
+        </div>
+      )}
     </section>
   );
 }
