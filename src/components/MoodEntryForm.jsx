@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PickEmotion from "./PickEmotion";
 import WellbeingScale from "./WellbeingScale";
+import "./MoodEntryForm.css";
 
 function MoodEntryForm({ date, onSave }) {
   const [selectedEmotions, setSelectedEmotions] = useState([]);

@@ -125,17 +125,8 @@ function MoodCalendar() {
     </div>
 
       <div className="mood-calendar__scroll">
-        <div className="mood-calendar__layout">"
-          <div className="mood-calendar__day-labels">
-            <div />
-            <div />
-            <div>Mon</div>
-            <div />
-            <div>Wed</div>
-            <div />
-            <div>Fri</div>
-            <div />
-          </div>
+        <div className="mood-calendar__layout">
+          <div className="mood-calendar__corner" />
 
           <div className="mood-calendar__month-labels">
             {monthLabels.map((month, index) => (
@@ -147,18 +138,28 @@ function MoodCalendar() {
               </div>
             ))}
           </div>
-        </div>
 
-        <div className="mood-calendar__grid">
-          {days.map((day) => (
-            <CalendarDay
-              key={day.date}
-              date={day.date}
-              score={day.score}
-              emotions={day.emotions}
-              onClick={handleDayClick}
-            />
-          ))}
+          <div className="mood-calendar__day-labels">
+            <div />
+            <div>Mon</div>
+            <div />
+            <div>Wed</div>
+            <div />
+            <div>Fri</div>
+            <div />
+          </div>
+
+          <div className="mood-calendar__grid">
+            {days.map((day) => (
+              <CalendarDay
+                key={day.date}
+                date={day.date}
+                score={day.score}
+                emotions={day.emotions}
+                onClick={handleDayClick}
+              />
+            ))}
+          </div>
         </div>
 
         <div className="mood-calendar__legend">
