@@ -1,64 +1,59 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CalendarDay from "./CalendarDay";
 import { wellbeingColors } from "../utils/wellbeingColors";
 import "./MoodCalendar.css";
 import MoodEntryForm from "./MoodEntryForm";
+import { getMoodEntries, createMoodEntry } from "../api/moodApi";
 
 function MoodCalendar() {
   const [selectedDay, setSelectedDay] = useState(null);
+  const [moodData, setMoodData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [moodData, setMoodData] = useState({
-    "2026-09-01": {
-      score: 2,
-      emotions: ["happy", "calm"],
-    },
-    "2026-09-02": {
-      score: 3,
-      emotions: ["okay"],
-    },
-    "2026-09-03": {
-      score: 5,
-      emotions: ["okay", "sad"],
-    },
-    "2026-09-04": {
-      score: 7,
-      emotions: ["stressed", "angry"],
-    },
-    "2026-09-05": {
-      score: 9,
-      emotions: ["anxious", "sad"],
-    },
-    "2026-09-06": {
-      score: 10,
-      emotions: ["overwhelmed", "anxious"],
-    },
-    "2026-09-07": {
-      score: 8,
-      emotions: ["sad"],
-    },
-    "2026-09-08": {
-      score: 5,
-      emotions: ["okay", "tired"],
-    },
-    "2026-09-09": {
-      score: 4,
-      emotions: ["okay"],
-    },
-    "2026-09-10": {
-      score: 2,
-      emotions: ["happy"],
-    },
-  });
+  useEffect(() => {
+    async function loadMoods() {
+      try {
+        const entries = await getMoodEntries();
+        const moodsByDate = {};
+        entries.forEach((entry) => {
+          const existing = moodsByDate[entry.date];
 
-  function handleSaveMood(entry) {
-    setMoodData((currentMoodData) => ({
-      ...currentMoodData,
-      [entry.date]: {
-        score: entry.score,
-        emotions: entry.emotions,
-        note: entry.note,
-      },
-    }));
+          if (!existing || entry.score > existing.score) {
+            moodsByDate[entry.date] = entry;
+          }
+        });
+
+        setMoodData(moodsByDate);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMoods();
+  }, []);
+
+  async function handleSaveMood(entry) {
+    try {
+      setError("");
+      const savedEntry = await createMoodEntry(entry);
+
+      setMoodData((current) => {
+        const existing = current[savedEntry.date];
+        if (existing && existing.score > savedEntry.score) {
+          return current;
+        }
+
+        return {
+          ...current,
+          [savedEntry.date]: savedEntry,
+        };
+      });
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   function generateCalendarDays() {
@@ -120,6 +115,12 @@ function MoodCalendar() {
     <section className="mood-calendar">
 
     <div className="mood-calendar__header">
+      {loading && <p>Loading your mood history...</p>}
+      {error && (
+        <p role="alert" className="mood-calendar__error">
+          {error}
+        </p>
+      )}
       <h2 className="mood-calendar__title">Your emotional year</h2>
       <p className="mood-calendar__subtitle">This is how you've been feeling.</p>
     </div>
