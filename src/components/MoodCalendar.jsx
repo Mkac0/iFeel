@@ -209,6 +209,7 @@ function MoodCalendar() {
           <MoodEntryForm
             date={selectedDay}
             onSave={handleSaveMood}
+            existingEntry={selectedMood}
           />
         </div>
       )}
