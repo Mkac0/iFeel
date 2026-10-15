@@ -16,10 +16,11 @@ function MoodCalendar() {
       try {
         const entries = await getMoodEntries();
         const moodsByDate = {};
+
         entries.forEach((entry) => {
           const existing = moodsByDate[entry.date];
 
-          if (!existing || entry.score > existing.score) {
+          if (!existing || new Date(entry.recorded_at) > new Date(existing.recorded_at)) {
             moodsByDate[entry.date] = entry;
           }
         });
@@ -40,17 +41,18 @@ function MoodCalendar() {
       setError("");
       const savedEntry = await createMoodEntry(entry);
 
-      setMoodData((current) => {
-        const existing = current[savedEntry.date];
-        if (existing && existing.score > savedEntry.score) {
-          return current;
-        }
+      // setMoodData((current) => {
+      //   const existing = current[savedEntry.date];
 
-        return {
-          ...current,
-          [savedEntry.date]: savedEntry,
-        };
-      });
+      //   if (existing && existing.score > savedEntry.score) {
+      //     return current;
+      //   }
+
+      //   return {
+      //     ...current,
+      //     [savedEntry.date]: savedEntry,
+      //   };
+      // });
     } catch (err) {
       setError(err.message);
     }
@@ -69,6 +71,7 @@ function MoodCalendar() {
 
     while (currentDate <= endDate) {
       const dateString = currentDate.toISOString().split("T")[0];
+
       days.push({
         date: dateString,
         dateObject: new Date(currentDate),
