@@ -1,12 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PickEmotion from "./PickEmotion";
 import WellbeingScale from "./WellbeingScale";
 import "./MoodEntryForm.css";
 
-function MoodEntryForm({ date, onSave }) {
+function MoodEntryForm({ date, onSave, existingEntry }) {
   const [selectedEmotions, setSelectedEmotions] = useState([]);
   const [score, setScore] = useState(5);
   const [note, setNote] = useState("");
+
+  useEffect(() => {
+    setSelectedEmotions(existingEntry?.emotions || []);
+    setScore(existingEntry?.score ?? 5);
+    setNote(existingEntry?.note || "");
+  }, [date, existingEntry]);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -19,9 +25,6 @@ function MoodEntryForm({ date, onSave }) {
     const entry = {date, emotions: selectedEmotions, score, note};
 
     onSave(entry);
-    setSelectedEmotions([]);
-    setScore(5);
-    setNote("");
   }
 
   return (

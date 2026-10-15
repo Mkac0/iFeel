@@ -20,5 +20,13 @@ class MoodEntry(models.Model):
     note = models.TextField(blank=True, null=True)
     recorded_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "date"],
+                name="unique_mood_per_user_per_day"
+            )
+        ]
+
     def __str__(self):
         return f"{self.user} - {self.date} - {self.score}/10"

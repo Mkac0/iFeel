@@ -14,4 +14,21 @@ class MoodEntryViewSet(viewsets.ModelViewSet):
         ).order_by('-date', '-recorded_at')
     
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        date = serializer.validated_data['date']
+
+        existing_entry = (
+            MoodEntry.objects.filter(
+                user=self.request.user,
+                date=date
+        )
+        .order_by('-recorded_at', '-id')
+        .first()
+        )
+
+        if existing_entry:
+            for field, value in serializer.validated_data.items():
+                setattr(existing_entry, field, value)
+            existing_entry.save()
+            serializer.instance = existing_entry
+        else:
+            serializer.save(user=self.request.user)
