@@ -9,6 +9,7 @@ function MoodEntryForm({ date, onSave, existingEntry }) {
   const [note, setNote] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setSelectedEmotions(existingEntry?.emotions || []);
@@ -35,6 +36,8 @@ function MoodEntryForm({ date, onSave, existingEntry }) {
     } catch (error) {
       setSaveMessage("Something went wrong, please try again.");
       setMessageType("error");
+    } finally {
+      setIsSaving(false);
     }
   }
 
@@ -71,8 +74,9 @@ function MoodEntryForm({ date, onSave, existingEntry }) {
       <button
         type="submit"
         className="mood-entry-form__submit"
+        disabled={isSaving}
       >
-        {existingEntry ? "Update Entry" : "Save Entry"}
+        {isSaving ? "Saving..." : existingEntry ? "Update Entry" : "Save Entry"}
       </button>
       {saveMessage && (
         <p className={`mood-entry-form__message mood-entry-form__message--${messageType}`} role={messageType === "error" ? "alert" : "status"}>
