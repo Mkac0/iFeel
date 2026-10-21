@@ -55,6 +55,7 @@ function MoodCalendar() {
       // });
     } catch (err) {
       setError(err.message);
+      throw err;
     }
   }
 

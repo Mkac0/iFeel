@@ -14,7 +14,7 @@ function MoodEntryForm({ date, onSave, existingEntry }) {
     setNote(existingEntry?.note || "");
   }, [date, existingEntry]);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     if (selectedEmotions.length === 0) {
@@ -24,7 +24,12 @@ function MoodEntryForm({ date, onSave, existingEntry }) {
 
     const entry = {date, emotions: selectedEmotions, score, note};
 
-    onSave(entry);
+    try {
+      await onSave(entry);
+      alert("Check-in saved successfully!");
+    } catch (error) {
+      alert("Something went wrong, please try again.");
+    }
   }
 
   return (
@@ -61,7 +66,7 @@ function MoodEntryForm({ date, onSave, existingEntry }) {
         type="submit"
         className="mood-entry-form__submit"
       >
-        Save check-in
+        {existingEntry ? "Update Entry" : "Save Entry"}
       </button>
     </form>
   );
