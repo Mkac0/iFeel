@@ -3,13 +3,14 @@ import CalendarDay from "./CalendarDay";
 import { wellbeingColors } from "../utils/wellbeingColors";
 import "./MoodCalendar.css";
 import MoodEntryForm from "./MoodEntryForm";
-import { getMoodEntries, createMoodEntry } from "../api/moodApi";
+import { getMoodEntries, createMoodEntry, deleteMoodEntry } from "../api/moodApi";
 
 function MoodCalendar() {
   const [selectedDay, setSelectedDay] = useState(null);
   const [moodData, setMoodData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deleteMessage, setDeleteMessage] = useState("");
 
   useEffect(() => {
     async function loadMoods() {
@@ -40,19 +41,34 @@ function MoodCalendar() {
     try {
       setError("");
       const savedEntry = await createMoodEntry(entry);
+      setMoodData((current) => ({
+        ...current,
+        [entry.date]: savedEntry,
+      }));
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  }
 
-      // setMoodData((current) => {
-      //   const existing = current[savedEntry.date];
+  async function handleDeleteMood() {
+    if (!selectedDay) return;
+    const entry = moodData[selectedDay];
+    if (!entry) return;
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this check-in? This cannot be undone."
+    );
+    if (!confirmed) return;
 
-      //   if (existing && existing.score > savedEntry.score) {
-      //     return current;
-      //   }
-
-      //   return {
-      //     ...current,
-      //     [savedEntry.date]: savedEntry,
-      //   };
-      // });
+    try {
+      setError("");
+      await deleteMoodEntry(entry.id);
+      setDeleteMessage("✓ Check-in deleted successfully.");
+      setMoodData((current) => {
+        const updated = { ...current };
+        delete updated[selectedDay];
+        return updated;
+      });
     } catch (err) {
       setError(err.message);
       throw err;
@@ -111,6 +127,7 @@ function MoodCalendar() {
 
   function handleDayClick(date) {
     setSelectedDay(date);
+    setDeleteMessage("");
   }
 
   const selectedMood = selectedDay ? moodData[selectedDay] : null;
@@ -185,6 +202,11 @@ function MoodCalendar() {
 
       {selectedDay && (
         <div className="mood-calendar__details">
+          {deleteMessage && (
+            <p className="mood-calendar__delete-message" role="status">
+              {deleteMessage}
+            </p>
+          )}
           <h3>{selectedDay}</h3>
           {selectedMood ? (
             <>
@@ -210,6 +232,7 @@ function MoodCalendar() {
           <MoodEntryForm
             date={selectedDay}
             onSave={handleSaveMood}
+            onDelete={handleDeleteMood}
             existingEntry={selectedMood}
           />
         </div>

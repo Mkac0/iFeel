@@ -48,3 +48,19 @@ export async function createMoodEntry(entry) {
 
     return response.json();
 }
+
+export async function deleteMoodEntry(id) {
+    await initializeCsrf();
+
+    const response = await fetch(`${API_URL}/moods/${id}/`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken") || "",
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Unable to delete mood: ${response.status}`);
+    }
+}

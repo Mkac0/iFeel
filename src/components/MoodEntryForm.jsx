@@ -3,7 +3,7 @@ import PickEmotion from "./PickEmotion";
 import WellbeingScale from "./WellbeingScale";
 import "./MoodEntryForm.css";
 
-function MoodEntryForm({ date, onSave, existingEntry }) {
+function MoodEntryForm({ date, onSave, onDelete, existingEntry }) {
   const [selectedEmotions, setSelectedEmotions] = useState([]);
   const [score, setScore] = useState(5);
   const [note, setNote] = useState("");
@@ -78,6 +78,11 @@ function MoodEntryForm({ date, onSave, existingEntry }) {
       >
         {isSaving ? "Saving..." : existingEntry ? "Update Entry" : "Save Entry"}
       </button>
+      {existingEntry && (
+        <button type="button" onClick={onDelete} className="mood-entry-form__delete" disabled={isSaving}>
+          Delete Entry
+        </button>
+      )}
       {saveMessage && (
         <p className={`mood-entry-form__message mood-entry-form__message--${messageType}`} role={messageType === "error" ? "alert" : "status"}>
           {saveMessage}

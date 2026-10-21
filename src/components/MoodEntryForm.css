@@ -165,6 +165,27 @@
   opacity: 0.94;
 }
 
+.mood-entry-form__delete {
+  margin-top: 10px;
+  padding: 12px 16px;
+  border: 1px solid #dc6b6b;
+  border-radius: 8px;
+  background-color: transparent;
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mood-entry-form__delete:hover {
+  background-color: #fde8e8;
+}
+
+.mood-entry-form__delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @media (max-width: 640px) {
   .wellbeing-scale {
     grid-template-columns: 1fr;
