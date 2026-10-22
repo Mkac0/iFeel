@@ -87,7 +87,10 @@ function MoodCalendar() {
     const currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
-      const dateString = currentDate.toISOString().split("T")[0];
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+      const day = String(currentDate.getDate()).padStart(2, "0");
+      const dateString = `${year}-${month}-${day}`;
 
       days.push({
         date: dateString,
@@ -131,6 +134,14 @@ function MoodCalendar() {
   }
 
   const selectedMood = selectedDay ? moodData[selectedDay] : null;
+
+  const now = new Date();
+
+  const todayString = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("-");
 
   return (
     <section className="mood-calendar">
@@ -179,6 +190,8 @@ function MoodCalendar() {
                 score={day.score}
                 emotions={day.emotions}
                 onClick={handleDayClick}
+                isSelected={selectedDay === day.date}
+                isToday={day.date === todayString}
               />
             ))}
           </div>

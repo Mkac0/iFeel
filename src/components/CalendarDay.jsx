@@ -1,6 +1,6 @@
 import { getWellbeingColor } from "../utils/wellbeingColors";
 
-function CalendarDay({ date, score, emotions = [], onClick }) {
+function CalendarDay({ date, score, emotions = [], onClick, isSelected, isToday }) {
   const backgroundColor = getWellbeingColor(score);
 
   const tooltip = score
@@ -13,7 +13,11 @@ function CalendarDay({ date, score, emotions = [], onClick }) {
       title={tooltip}
       onClick={() => onClick(date)}
       aria-label={tooltip}
-      className="mood-calendar__day"
+      className={[
+        "mood-calendar__day",
+        isSelected && "mood-calendar__day--selected",
+        isToday && "mood-calendar__day--today",
+      ].filter(Boolean).join(" ")}
       style={{ backgroundColor }}
     />
   );
